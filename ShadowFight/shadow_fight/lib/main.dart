@@ -89,7 +89,7 @@ class GameScreenState extends State<GameScreen> with SingleTickerProviderStateMi
   }
 
   void _gameLoop() async {
-    final duration = const Duration(milliseconds: 16);
+    const duration = Duration(milliseconds: 16);
     while (mounted) {
       final startTime = DateTime.now();
       
