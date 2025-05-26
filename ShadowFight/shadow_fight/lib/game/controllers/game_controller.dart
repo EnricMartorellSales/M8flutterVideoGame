@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flame/input.dart';
 import 'package:flame/geometry.dart';
@@ -12,28 +13,57 @@ class GameController {
     player = game.player;
   }
 
-  void onKeyEvent(RawKeyEvent event) {
-    final isDown = event is RawKeyDownEvent;
+  void handleKeyEvent(RawKeyEvent event) {
+    final isKeyDown = event is RawKeyDownEvent;
 
     switch (event.logicalKey) {
       case LogicalKeyboardKey.keyA:
-        player.moveLeft = isDown;
+        player.moveLeft = isKeyDown;
+        if (isKeyDown) player.facingRight = false;
         break;
       case LogicalKeyboardKey.keyD:
-        player.moveRight = isDown;
+        player.moveRight = isKeyDown;
+        if (isKeyDown) player.facingRight = true;
         break;
       case LogicalKeyboardKey.space:
-        if (isDown) player.jump();
+        if (isKeyDown) player.jump();
+        break;
+      default:
         break;
     }
   }
 
-  void onPointerDown(PointerDownEvent event) {
-    final worldPos = game.cameraComponent.viewfinder.localToGlobal(
-      Vector2(event.localPosition.dx, event.localPosition.dy),
+  void handlePointerDown(PointerDownEvent event) {
+    final localPosition = Vector2(
+      event.localPosition.dx,
+      event.localPosition.dy,
     );
-    player.shoot(worldPos);
+    
+    final worldPosition = game.cameraComponent.viewfinder.localToGlobal(localPosition);
+    player.shoot(worldPosition);
   }
 
-  void update(double dt) {}
+  void update(double dt) {
+    _checkBulletEnemyCollisions();
+  }
+
+  void _checkBulletEnemyCollisions() {
+    for (final bullet in game.bullets.toList()) {
+      for (final enemy in game.enemies.toList()) {
+        if (bullet.isRemoved) continue;
+        
+        if (bullet.toRect().overlaps(enemy.toRect())) {
+          enemy.health -= 25;
+          bullet.removeFromParent();
+          game.bullets.remove(bullet);
+          
+          if (enemy.health <= 0) {
+            enemy.removeFromParent();
+            game.enemies.remove(enemy);
+          }
+          break;
+        }
+      }
+    }
+  }
 }

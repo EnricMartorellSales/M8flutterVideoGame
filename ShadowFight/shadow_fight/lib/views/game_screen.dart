@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flame/game.dart';
 import 'package:shadow_fight/game/shadow_complex_game.dart';
-import 'package:shadow_fight/views/hud.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
@@ -22,12 +21,16 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GameWidget(
-        game: game,
-        mouseCursor: SystemMouseCursors.click,
-        overlayBuilderMap: {
-          'hud': (context, game) => HudOverlay(game: game as ShadowComplexGame),
-        },
+      body: RawKeyboardListener(
+        focusNode: FocusNode(),
+        autofocus: true,
+        onKey: game.gameController.handleKeyEvent,
+        child: Listener(
+          onPointerDown: game.gameController.handlePointerDown,
+          child: GameWidget(
+            game: game,
+          ),
+        ),
       ),
     );
   }

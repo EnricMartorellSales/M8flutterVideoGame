@@ -1,18 +1,21 @@
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flame/components.dart';
+import 'package:shadow_fight/game/controllers/game_controller.dart';
 import 'package:shadow_fight/game/components/player.dart';
 import 'package:shadow_fight/game/components/enemy.dart';
 import 'package:shadow_fight/game/components/platform.dart';
-import 'package:shadow_fight/game/controllers/game_controller.dart';
+import 'package:shadow_fight/game/components/bullet.dart';
 
-class ShadowComplexGame extends FlameGame with HasKeyboardHandlerComponents, HasCollisionDetection {
+class ShadowComplexGame extends FlameGame with HasCollisionDetection {
   late final GameController gameController;
   late Player player;
   late CameraComponent cameraComponent;
   final double groundLevel = 300;
   final double levelWidth = 2000;
-
+  final List<Enemy> enemies = [];
+  final List<Bullet> bullets = [];
+  
   @override
   Future<void> onLoad() async {
     await super.onLoad();
@@ -21,7 +24,7 @@ class ShadowComplexGame extends FlameGame with HasKeyboardHandlerComponents, Has
     cameraComponent.viewfinder.anchor = Anchor.topLeft;
     addAll([cameraComponent, world]);
     
-    player = Player(position: Vector2(100, groundLevel));
+    player = Player(position: Vector2(100, groundLevel), game: this);
     world.add(player);
     cameraComponent.follow(player);
 
@@ -45,13 +48,16 @@ class ShadowComplexGame extends FlameGame with HasKeyboardHandlerComponents, Has
       ));
     }
   }
-
+  
   void _generateEnemies() {
     for (int i = 0; i < 5; i++) {
-      world.add(Enemy(
-        position: Vector2(500.0 + (i * 300), groundLevel - 70),
+      final enemy = Enemy(
+        position: Vector2(500.0 + i * 300, groundLevel - 70),
         size: Vector2(40, 70),
-      ));
+        game: this,
+      );
+      enemies.add(enemy);
+      world.add(enemy);
     }
   }
 }

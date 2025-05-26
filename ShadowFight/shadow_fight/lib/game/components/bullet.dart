@@ -1,14 +1,17 @@
-import 'dart:ui';
 import 'package:flame/components.dart';
-import 'package:flame/geometry.dart';
 import 'package:flutter/material.dart';
 import 'package:shadow_fight/game/shadow_complex_game.dart';
 
-class Bullet extends PositionComponent with HasGameRef<ShadowComplexGame> {
+class Bullet extends PositionComponent {
+  final ShadowComplexGame game;
   final Vector2 direction;
   final double speed = 15;
   
-  Bullet({required super.position, required this.direction}) {
+  Bullet({
+    required super.position,
+    required this.direction,
+    required this.game,
+  }) {
     size = Vector2(16, 8);
     anchor = Anchor.center;
   }
@@ -22,6 +25,7 @@ class Bullet extends PositionComponent with HasGameRef<ShadowComplexGame> {
     if (position.x < 0 || position.x > game.levelWidth ||
         position.y < 0 || position.y > game.size.y) {
       removeFromParent();
+      game.bullets.remove(this);
     }
   }
   
