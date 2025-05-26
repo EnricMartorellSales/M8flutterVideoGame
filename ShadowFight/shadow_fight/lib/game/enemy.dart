@@ -1,7 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flame/collisions.dart';
 import 'package:flutter/material.dart';
-
 import 'package:shadow_fight/game/shadow_complex_game.dart';
 import 'dart:math';
 
@@ -12,7 +11,8 @@ class Enemy extends PositionComponent with CollisionCallbacks {
   int direction = 1;
   final Random _random = Random();
   
-  Enemy({required super.position, required this.game, super.size}) {
+  Enemy({required super.position, required this.game}) {
+    size = Vector2(40, 70);
     anchor = Anchor.bottomCenter;
   }
   

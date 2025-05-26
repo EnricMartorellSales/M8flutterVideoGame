@@ -2,9 +2,9 @@ import 'package:flame/components.dart';
 import 'package:flame/collisions.dart';
 import 'package:flutter/material.dart';
 
-
 class Platform extends PositionComponent with CollisionCallbacks {
-  Platform({required super.position, required super.size}) {
+  Platform({required super.position}) {
+    size = Vector2(100, 20);
     anchor = Anchor.center;
   }
   

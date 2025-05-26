@@ -1,28 +1,36 @@
 import 'package:flame/components.dart';
 import 'package:flame/collisions.dart';
+import 'package:flame/input.dart';
 import 'package:flutter/material.dart';
-import 'package:shadow_fight/game/components/bullet.dart';
-import 'package:shadow_fight/game/shadow_complex_game.dart';
+import 'package:flutter/services.dart';
+import 'shadow_complex_game.dart';
+import 'bullet.dart';
 
-class Player extends PositionComponent with HasGameRef<ShadowComplexGame>, CollisionCallbacks {
+class Player extends PositionComponent with KeyboardHandler, CollisionCallbacks, HasGameRef<ShadowComplexGame> {
   double velocityY = 0;
   double velocityX = 0;
   bool isJumping = false;
   bool facingRight = true;
-  double health = 100;
   bool moveLeft = false;
   bool moveRight = false;
+  double _health = 100;
   
+  double get health => _health;
+  set health(double value) {
+    _health = value.clamp(0, 100);
+    game.playerHealth.value = _health;
+  }
+
   final double gravity = 0.8;
   final double jumpForce = -15;
   final double acceleration = 0.5;
   final double friction = 0.85;
   bool canShoot = true;
   final double shootCooldown = 0.3;
-  
 
-  Player({required super.position, required super.game}) {
+  Player({required super.game}) {
     size = Vector2(50, 80);
+    position = Vector2(100, game.groundLevel);
     anchor = Anchor.center;
   }
 
@@ -74,7 +82,7 @@ class Player extends PositionComponent with HasGameRef<ShadowComplexGame>, Colli
       direction: (targetPosition - position).normalized(),
       game: game,
     );
-    game.world.add(bullet);
+    game.add(bullet);
     game.bullets.add(bullet);
     
     canShoot = false;
@@ -82,11 +90,28 @@ class Player extends PositionComponent with HasGameRef<ShadowComplexGame>, Colli
       canShoot = true;
     });
   }
+
+  @override
+  bool onKeyEvent(RawKeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
+    final isDown = event is RawKeyDownEvent;
+    
+    switch (event.logicalKey) {
+      case LogicalKeyboardKey.keyA:
+        moveLeft = isDown;
+        return true;
+      case LogicalKeyboardKey.keyD:
+        moveRight = isDown;
+        return true;
+      case LogicalKeyboardKey.space:
+        if (isDown) jump();
+        return true;
+      default:
+        return false;
+    }
+  }
   
   @override
   void render(Canvas canvas) {
-    super.render(canvas);
-    
     final paint = Paint()
       ..color = Colors.blue.shade700
       ..style = PaintingStyle.fill;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shadow_fight/views/game_screen.dart';
+import 'package:shadow_fight/widgets/game_screen.dart';
 
 void main() {
   runApp(const MyApp());
