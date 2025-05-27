@@ -1,10 +1,10 @@
 import 'package:flame/game.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
-import 'player.dart';
-import 'enemy.dart';
-import 'platform.dart';
-import 'bullet.dart';
+import 'package:shadow_fight/game/player.dart';
+import 'package:shadow_fight/game/enemy.dart';
+import 'package:shadow_fight/game/platform.dart';
+import 'package:shadow_fight/game/bullet.dart';
 
 class ShadowComplexGame extends FlameGame with HasCollisionDetection {
   final ValueNotifier<int> enemyCount = ValueNotifier(0);
@@ -13,6 +13,7 @@ class ShadowComplexGame extends FlameGame with HasCollisionDetection {
   final double groundLevel = 300;
   final double levelWidth = 2000;
   final List<Bullet> bullets = [];
+  final List<Enemy> enemies = [];
 
   @override
   Future<void> onLoad() async {
@@ -47,8 +48,27 @@ class ShadowComplexGame extends FlameGame with HasCollisionDetection {
   @override
   void update(double dt) {
     super.update(dt);
-    enemyCount.value = children.whereType<Enemy>().length;
+    enemyCount.value = enemies.where((e) => !e.isRemoved).length;
     playerHealth.value = player.health;
+
+    // Check bullet-enemy collisions
+    for (final bullet in bullets.toList()) {
+      for (final enemy in enemies.toList()) {
+        if (bullet.isRemoved || enemy.isRemoved) continue;
+        
+        if (bullet.toRect().overlaps(enemy.toRect())) {
+          enemy.health -= 25;
+          bullet.removeFromParent();
+          bullets.remove(bullet);
+          
+          if (enemy.health <= 0) {
+            enemy.removeFromParent();
+            enemies.remove(enemy);
+          }
+          break;
+        }
+      }
+    }
   }
 
   @override

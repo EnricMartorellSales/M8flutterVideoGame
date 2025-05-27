@@ -3,8 +3,8 @@ import 'package:flame/collisions.dart';
 import 'package:flame/input.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'shadow_complex_game.dart';
-import 'bullet.dart';
+import 'package:shadow_fight/game/shadow_complex_game.dart';
+import 'package:shadow_fight/game/bullet.dart';
 
 class Player extends PositionComponent with KeyboardHandler, CollisionCallbacks, HasGameRef<ShadowComplexGame> {
   double velocityY = 0;
@@ -28,7 +28,8 @@ class Player extends PositionComponent with KeyboardHandler, CollisionCallbacks,
   bool canShoot = true;
   final double shootCooldown = 0.3;
 
-  Player({required super.game}) {
+  Player({required ShadowComplexGame game}) {
+    this.game = game;
     size = Vector2(50, 80);
     position = Vector2(100, game.groundLevel);
     anchor = Anchor.center;
@@ -92,8 +93,8 @@ class Player extends PositionComponent with KeyboardHandler, CollisionCallbacks,
   }
 
   @override
-  bool onKeyEvent(RawKeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
-    final isDown = event is RawKeyDownEvent;
+  bool onKeyEvent(KeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
+    final isDown = event is KeyDownEvent;
     
     switch (event.logicalKey) {
       case LogicalKeyboardKey.keyA:
